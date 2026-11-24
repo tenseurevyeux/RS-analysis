@@ -1,7 +1,11 @@
 [package]
-name = "sarfimax_model"
+name = "arfima_model"
 version = "0.1.0"
 edition = "2024"
+
+[lib]
+name = "arfima_model"
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 s-h-esd = { path = "../s-h-esd" }
@@ -14,6 +18,5 @@ arma = { path = "../arma" }
 forecast = { path = "../forecast" }
 confidence-intervals = { path = "../confidence-intervals"}
 
-pyo3 = { version = "0.25.0", features = ["extension-module", "macros", "auto-initialize"] }
+pyo3 = { version = "0.25.0", features = ["extension-module", "macros"] }
 numpy = { version = "0.25.0" }
-

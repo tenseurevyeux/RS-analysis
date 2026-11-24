@@ -1,39 +1,36 @@
 use utils::{autocov, var};
-use std::f64;
-
 
 pub struct YwResult {
     pub pacf: Vec<f64>,
     pub phi: Vec<Vec<f64>>,
 }
 
-
 pub fn durbin_yw(series: &[f64], nlags: usize) -> YwResult {
-
     let n = series.len();
-    let mean = series.iter().sum::<f64>() / n as f64;
-    let mut gamma = vec![0.0; nlags + 1];
-    for k in 0..=nlags {
-        let mut sum = 0.0;
-        for t in k..n {
-            sum += (series[t] - mean) * (series[t - k] - mean);
-        }
-        gamma[k] = sum / n as f64;
-    }
-
     let mut pacf = vec![0.0; nlags + 1];
     let mut phi = vec![vec![0.0; nlags + 1]; nlags + 1];
-    let mut sigma2 = vec![0.0; nlags + 1];
-    sigma2[0] = gamma[0];
     pacf[0] = 1.0;
+    if n == 0 {
+        return YwResult { pacf, phi };
+    }
 
-    for lag in 1..=nlags {
+    let eff = nlags.min(n - 1);
+    let gamma = autocov(series, eff);
+    let mut sigma2 = vec![0.0; eff + 1];
+    sigma2[0] = gamma[0].max(1e-12);
 
+    for lag in 1..=eff {
         let mut acc = 0.0;
         for j in 1..lag {
             acc += phi[lag - 1][j] * gamma[lag - j];
         }
-        let kappa = (gamma[lag] - acc) / sigma2[lag - 1];
+
+        let kappa = if sigma2[lag - 1] > 1e-12 {
+            ((gamma[lag] - acc) / sigma2[lag - 1]).clamp(-0.9999, 0.9999)
+        } else {
+            0.0
+        };
+
         pacf[lag] = kappa;
         phi[lag][lag] = kappa;
 
@@ -41,17 +38,24 @@ pub fn durbin_yw(series: &[f64], nlags: usize) -> YwResult {
             phi[lag][j] = phi[lag - 1][j] - kappa * phi[lag - 1][lag - j];
         }
 
-        sigma2[lag] = sigma2[lag - 1] * (1.0 - kappa * kappa);
+        sigma2[lag] = (sigma2[lag - 1] * (1.0 - kappa * kappa)).max(1e-12);
     }
 
     YwResult { pacf, phi }
 }
 
 pub fn acf(series: &[f64], nlags: usize) -> Vec<f64> {
-    let var = var(series);
-    let acf:Vec<f64> = autocov(series, nlags).iter().map(|&cov| cov / var).collect();
+    let mut out = vec![0.0; nlags + 1];
+    out[0] = 1.0;
 
-    acf
+    let v = var(series);
+    if series.is_empty() || v < 1e-12 {
+        return out;
+    }
+    for (slot, cov) in out.iter_mut().zip(autocov(series, nlags)).skip(1) {
+        *slot = (cov / v).clamp(-1.0, 1.0);
+    }
+    out
 }
 
 pub fn significant_lags(vals: &[f64], threshold: f64) -> Vec<usize> {

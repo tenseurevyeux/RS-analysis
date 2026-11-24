@@ -18,6 +18,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "arfima_model"
+version = "0.1.0"
+dependencies = [
+ "arma",
+ "box-cox",
+ "confidence-intervals",
+ "forecast",
+ "frac-integration",
+ "numpy",
+ "pacf-acf",
+ "pyo3",
+ "rs-analysis",
+ "s-h-esd",
+ "utils",
+]
+
+[[package]]
 name = "argmin"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -88,11 +105,15 @@ name = "confidence-intervals"
 version = "0.1.0"
 dependencies = [
  "frac-integration",
+ "utils",
 ]
 
 [[package]]
 name = "forecast"
 version = "0.1.0"
+dependencies = [
+ "utils",
+]
 
 [[package]]
 name = "frac-integration"
@@ -439,6 +460,9 @@ checksum = "60a357793950651c4ed0f3f52338f53b2f809f32d83a07f72909fa13e4c6c1e3"
 [[package]]
 name = "rs-analysis"
 version = "0.1.0"
+dependencies = [
+ "statrs",
+]
 
 [[package]]
 name = "rustc-hash"
@@ -461,23 +485,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96b02de82ddbe1b636e6170c21be622223aea188ef2e139be0a5b219ec215323"
 dependencies = [
  "bytemuck",
-]
-
-[[package]]
-name = "sarfimax_model"
-version = "0.1.0"
-dependencies = [
- "arma",
- "box-cox",
- "confidence-intervals",
- "forecast",
- "frac-integration",
- "numpy",
- "pacf-acf",
- "pyo3",
- "rs-analysis",
- "s-h-esd",
- "utils",
 ]
 
 [[package]]

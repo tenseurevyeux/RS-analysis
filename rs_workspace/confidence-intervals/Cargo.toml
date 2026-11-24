@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 frac-integration = { path="../frac-integration" }
+utils = { path = "../utils" }
