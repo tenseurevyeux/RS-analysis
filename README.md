@@ -17,7 +17,6 @@ Designed for high-frequency financial time series, crypto market regime detectio
 - [`arfima_model` API Reference](#-arfima_model-api-reference)
 - [Validation vs. statsmodels ARIMA](#-validation-vs-statsmodels-arima)
 - [Mathematical Deep-Dive](#-mathematical-deep-dive)
-- [License](#-license)
 
 ---
 
@@ -103,8 +102,6 @@ The workspace is modularized into 10 decoupled, high-performance crates:
 
 - **Panic-Resistant Sorting:** Uses `f64::total_cmp` instead of `partial_cmp().unwrap()` on floating-point numbers, so NaNs in malformed data don't crash the sort.
 - **Length-Preserving Causal Filters:** Fractional differentiation uses expanding-window memory convolution so that $N$ input points always yield exactly $N$ filtered points.
-- **Strict Inversion Composition:** Forecasts and impulse-response confidence bounds respect monotonic transformations:
-  $$\hat{Y} = \text{RevBoxCox}\Big(\text{RevZScore}\big(\text{RevFracDiff}(\hat{W})\big)\Big)$$
 - **Memory Efficient:** Allocation-conscious Rust loops avoid intermediate vector duplication.
 - **PyO3 & NumPy Interoperability:** Python bindings accept NumPy arrays.
 
@@ -334,7 +331,10 @@ so expect only a rough match.
 
 ### 1. Rescaled Range (R/S) Hurst Exponent ($H$)
 For sub-periods of length $\tau$, the rescaled range is computed on increments:
-$$\left(R/S\right)_\tau = \frac{\max_{1 \le t \le \tau} \sum_{i=1}^t (X_i - \bar{X}) - \min_{1 \le t \le \tau} \sum_{i=1}^t (X_i - \bar{X})}{\sqrt{\frac{1}{\tau} \sum_{i=1}^\tau (X_i - \bar{X})^2}}$$
+
+```math
+(R/S)_\tau = \frac{\max_{1 \le t \le \tau} Y_t - \min_{1 \le t \le \tau} Y_t}{S_\tau}
+```
 
 The Hurst exponent $H$ is estimated by OLS linear regression:
 $$\log\left(R/S\right)_\tau = c + H \log(\tau)$$
@@ -356,6 +356,3 @@ $$\Psi(L) = (1 - L)^{-d} \frac{\Theta(L)}{\Phi(L)} = \sum_{j=0}^{\infty} \psi_j 
 The $h$-step-ahead forecast error variance expands monotonically as:
 $$\sigma^2(h) = \sigma_\epsilon^2 \sum_{j=0}^{h-1} \psi_j^2$$
 providing statistically sound, non-collapsing prediction envelopes.
-
-## 📄 License
-MIT. Note: no `LICENSE` file is currently in the repository; add one before relying on this.
